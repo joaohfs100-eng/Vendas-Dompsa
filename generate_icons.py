@@ -1,10 +1,11 @@
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 
 src = "/home/ubuntu/vendas-dompsa-pwa/icons/icon-base.png"
 out_dir = "/home/ubuntu/vendas-dompsa-pwa/icons"
 
-img = Image.open(src).convert("RGBA")
+# Abrir imagem e garantir que é RGB (o JPEG original)
+img = Image.open(src).convert("RGB")
 
 # Tamanhos necessários para iOS PWA e manifest
 sizes = [
@@ -20,48 +21,40 @@ sizes = [
     (180, "apple-touch-icon-180x180.png"),
     (192, "icon-192x192.png"),
     (512, "icon-512x512.png"),
-    (180, "apple-touch-icon.png"),  # default apple touch icon
+    (180, "apple-touch-icon.png"),
 ]
 
 for size, name in sizes:
     resized = img.resize((size, size), Image.LANCZOS)
-    # Convert to RGB for non-transparent icons (iOS apple-touch-icon)
-    if "apple" in name:
-        bg = Image.new("RGB", (size, size), (8, 12, 20))
-        bg.paste(resized, mask=resized.split()[3])
-        bg.save(os.path.join(out_dir, name), "PNG")
-    else:
-        resized.save(os.path.join(out_dir, name), "PNG")
+    resized.save(os.path.join(out_dir, name), "PNG")
     print(f"Generated: {name} ({size}x{size})")
 
 # Gerar splash screens para iPhone
 splash_sizes = [
-    (2048, 2732, "splash-2048x2732.png"),   # iPad Pro 12.9"
-    (1668, 2388, "splash-1668x2388.png"),   # iPad Pro 11"
-    (1536, 2048, "splash-1536x2048.png"),   # iPad Air/Mini
-    (1125, 2436, "splash-1125x2436.png"),   # iPhone X/XS
-    (1242, 2688, "splash-1242x2688.png"),   # iPhone XS Max
-    (828, 1792, "splash-828x1792.png"),     # iPhone XR
-    (1170, 2532, "splash-1170x2532.png"),   # iPhone 12/13/14
-    (1284, 2778, "splash-1284x2778.png"),   # iPhone 12/13/14 Pro Max
-    (1179, 2556, "splash-1179x2556.png"),   # iPhone 14 Pro
-    (1290, 2796, "splash-1290x2796.png"),   # iPhone 14 Pro Max
-    (750, 1334, "splash-750x1334.png"),     # iPhone 8/SE
-    (1080, 1920, "splash-1080x1920.png"),   # iPhone 8 Plus
+    (2048, 2732, "splash-2048x2732.png"),
+    (1668, 2388, "splash-1668x2388.png"),
+    (1536, 2048, "splash-1536x2048.png"),
+    (1125, 2436, "splash-1125x2436.png"),
+    (1242, 2688, "splash-1242x2688.png"),
+    (828, 1792, "splash-828x1792.png"),
+    (1170, 2532, "splash-1170x2532.png"),
+    (1284, 2778, "splash-1284x2778.png"),
+    (1179, 2556, "splash-1179x2556.png"),
+    (1290, 2796, "splash-1290x2796.png"),
+    (750, 1334, "splash-750x1334.png"),
+    (1080, 1920, "splash-1080x1920.png"),
 ]
 
-icon_for_splash = img.resize((200, 200), Image.LANCZOS)
+# Ícone para a splash (um pouco maior que antes)
+icon_for_splash = img.resize((300, 300), Image.LANCZOS)
 
 for w, h, name in splash_sizes:
-    splash = Image.new("RGB", (w, h), (8, 12, 20))
-    # Adicionar gradiente azul sutil
-    from PIL import ImageDraw
-    draw = ImageDraw.Draw(splash)
-    # Colocar ícone centralizado
-    x = (w - 200) // 2
-    y = (h - 200) // 2
-    splash.paste(icon_for_splash, (x, y), mask=icon_for_splash.split()[3])
+    # Fundo amarelo/dourado combinando com o ícone
+    splash = Image.new("RGB", (w, h), (255, 204, 0))
+    x = (w - 300) // 2
+    y = (h - 300) // 2
+    splash.paste(icon_for_splash, (x, y))
     splash.save(os.path.join(out_dir, name), "PNG")
     print(f"Generated splash: {name} ({w}x{h})")
 
-print("All icons and splash screens generated!")
+print("All icons and splash screens updated with the new design!")
